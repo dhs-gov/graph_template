@@ -54,3 +54,7 @@ To visualize your own model performance:
 1. Modify the `generate_dummy_data()` function to include your actual model metrics
 2. Adjust category names, baselines, and model names as needed
 3. Run the script to generate your custom visualization
+
+## JavaScript Graphs
+
+The `javascript_graphs` now has .jpeg files and code for three sample graphs with different styles. 
