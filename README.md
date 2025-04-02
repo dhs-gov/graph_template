@@ -2,59 +2,32 @@
 
 ## Overview
 
-This Python tool creates an HTML report that compares different model performances for classifying "High Priority" items. The report displays side-by-side bar charts showing each model's prediction rate and detection rate (recall) compared to a baseline.
+This Python tool creates an HTML report that visualizes model performance for document review tasks, showing which models provide the best balance of review efficiency and important item detection.
 
-## Features
+## Repository Structure
 
-- **Performance Comparison**: Shows multiple models with color-coded horizontal bar charts
-- **Two Key Metrics**: 
-  - **Prediction Rate**: The percentage of all samples each model classified as "High Priority"
-  - **Detection Rate**: The percentage of actual "High Priority" items each model correctly identified
-- **Baseline Comparison**: Metrics displayed against random guessing (the baseline frequency of the category)
-- **Color Coding**: Green, yellow, and red indicators for performance levels
-- **HTML Output**: Self-contained HTML file viewable in any browser
-
-## How It Works
-
-The tool:
-1. Generates performance metrics for model variations
-2. Creates an HTML report with bar charts 
-3. Outputs an HTML file viewable in web browsers
-
-## Performance Metrics
-
-- **Prediction Rate**: Lower is better - below baseline means the model is more selective
-- **Detection Rate**: Higher is better - above baseline means the model finds more relevant items
-- **Best Model**: Has low prediction rate and high detection rate
+- `three_graphs.py` - Main Python script that generates performance visualizations
+- `model_performance.html` - The HTML output file with interactive visualizations
+- `model_comparison/` - Directory where PNG exports of the charts are saved
+- `javascript_graphs/` - Reference React code for graph styling (not runnable)
+- `archive/` - Contains previous Python implementation
 
 ## Usage
 
 ```bash
-python main.py
+python three_graphs.py
 ```
 
-Optional arguments:
-- `--output PATH`: Specify custom output path (default: `category_performance.html`)
+This will:
+1. Generate three visualization types
+2. Save PNGs to the model_comparison directory
+3. Create an interactive model_performance.html file
 
-## Example Output
+## Customization
 
-The example data shows three model variations:
-- **Model A**: Most selective (predicts fewer items as High Priority) with highest detection rate
-- **Model B**: Less selective but with good detection capabilities
-- **Model C**: Over-predicts High Priority items yet has the lowest detection rate
+To visualize your own model performance, modify the model data in the `three_graphs.py` script.
 
 ## Requirements
 
 - Python 3.6+
-- No external libraries required
-
-## Customization
-
-To visualize your own model performance:
-1. Modify the `generate_dummy_data()` function to include your actual model metrics
-2. Adjust category names, baselines, and model names as needed
-3. Run the script to generate your custom visualization
-
-## JavaScript Graphs
-
-The `javascript_graphs` now has .jpeg files and code for three sample graphs with different styles. 
+- Web browser to view the HTML output

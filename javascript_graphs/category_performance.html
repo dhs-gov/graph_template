@@ -1,0 +1,269 @@
+# run_visualization.py
+import subprocess
+import webbrowser
+import os
+import time
+import pandas as pd
+import numpy as np
+# Add other imports you need for data processing
+
+def process_data():
+    """
+    Process your data here using pandas, numpy, etc.
+    This is where you'd do all your Python data processing.
+    """
+    # Example: Load and process data
+    # df = pd.read_csv('your_data.csv')
+    # processed_data = your_processing_function(df)
+    # processed_data.to_json('static/processed_data.json', orient='records')
+    
+    print("Data processing complete!")
+
+def setup_environment():
+    """Check if required packages are installed and install if needed."""
+    try:
+        import flask
+    except ImportError:
+        print("Installing Flask...")
+        subprocess.check_call(["pip", "install", "flask"])
+        
+    # Create templates directory if it doesn't exist
+    if not os.path.exists("templates"):
+        os.makedirs("templates")
+
+def main():
+    # Setup environment
+    setup_environment()
+    
+    # Process data with Python
+    process_data()
+    
+    # Write the template file
+    with open("templates/index.html", "w") as f:
+        f.write("""<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Visualization</title>
+    <!-- Load React -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Load Recharts -->
+    <script src="https://unpkg.com/recharts@2.5.0/umd/Recharts.js" crossorigin></script>
+    
+    <!-- Load Babel for JSX support -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div id="root" class="max-w-5xl mx-auto"></div>
+
+    <script type="text/babel">
+        // Destructure the components from Recharts
+        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
+        
+        // Define the chart component
+        const TrulySideBySideChart = () => {
+          const [chartData, setChartData] = React.useState([]);
+          const [loading, setLoading] = React.useState(true);
+          
+          // Fetch data from Python backend
+          React.useEffect(() => {
+            fetch('/api/chart-data')
+              .then(response => response.json())
+              .then(data => {
+                setChartData(data);
+                setLoading(false);
+              })
+              .catch(error => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+              });
+          }, []);
+          
+          // Custom tooltip component
+          const CustomTooltip = ({ active, payload }) => {
+            if (active && payload && payload.length) {
+              const data = payload[0].payload;
+              return (
+                <div className="p-3 bg-white border border-gray-200 rounded shadow-sm">
+                  <p className="font-medium">{data.name}</p>
+                  <p>Flags {data.flagged}% of all content</p>
+                  {payload[0].dataKey === 'efficiency' ? (
+                    <p><strong>{data.efficiency}%</strong> of flagged items are important</p>
+                  ) : (
+                    <p>Finds <strong>{data.coverage}%</strong> of important items</p>
+                  )}
+                </div>
+              );
+            }
+            return null;
+          };
+          
+          if (loading) {
+            return <div className="text-center p-10">Loading data...</div>;
+          }
+          
+          return (
+            <div className="p-4 bg-white rounded-lg shadow-sm">
+              <h2 className="text-xl font-semibold mb-4">Model Performance Comparison</h2>
+              
+              <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+                {/* Efficiency Chart */}
+                <div className="flex-1">
+                  <h3 className="text-base font-medium mb-1">Efficiency</h3>
+                  <p className="text-xs text-gray-500 mb-2">% of flagged items that are actually important</p>
+                  
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis 
+                          domain={[0, 100]} 
+                          tickCount={6}
+                          label={{ value: '%', angle: -90, position: 'insideLeft' }} 
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Bar 
+                          dataKey="efficiency" 
+                          fill="#4CAF50" 
+                          radius={[4, 4, 0, 0]}
+                          barSize={40}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1 text-center">Higher is better - less wasted effort</p>
+                </div>
+                
+                {/* Coverage Chart */}
+                <div className="flex-1">
+                  <h3 className="text-base font-medium mb-1">Coverage</h3>
+                  <p className="text-xs text-gray-500 mb-2">% of important items found</p>
+                  
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis 
+                          domain={[0, 100]} 
+                          tickCount={6}
+                          label={{ value: '%', angle: -90, position: 'insideLeft' }} 
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Bar 
+                          dataKey="coverage" 
+                          fill="#2196F3" 
+                          radius={[4, 4, 0, 0]}
+                          barSize={40}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1 text-center">Higher is better - fewer missed items</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-sm text-gray-600 border-t pt-3">
+                <p><strong>Model A</strong> is most efficient (98%) while still finding the most important items (82%).</p>
+              </div>
+            </div>
+          );
+        };
+        
+        // Render the component
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TrulySideBySideChart />);
+    </script>
+</body>
+</html>""")
+    
+    # Create app.py
+    with open("app.py", "w") as f:
+        f.write("""from flask import Flask, jsonify, render_template
+import pandas as pd
+import numpy as np
+# Add your data processing imports here
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    \"\"\"Serve the main page with the React component.\"\"\"
+    return render_template('index.html')
+
+@app.route('/api/chart-data')
+def chart_data():
+    \"\"\"Process data with Python and return it as JSON for the React component.\"\"\"
+    # Replace this with your actual data processing code
+    # This is just sample data similar to what's in your React component
+    data = [
+        {
+            "name": "Model A",
+            "efficiency": 98,
+            "coverage": 82,
+            "flagged": 12.5
+        },
+        {
+            "name": "Model B",
+            "efficiency": 63,
+            "coverage": 69,
+            "flagged": 16.2
+        },
+        {
+            "name": "Model C",
+            "efficiency": 25,
+            "coverage": 54,
+            "flagged": 32.5
+        }
+    ]
+    
+    # You can do any pandas/numpy processing here
+    # For example:
+    # df = pd.DataFrame(data)
+    # processed_data = some_processing_function(df)
+    # return jsonify(processed_data.to_dict('records'))
+    
+    return jsonify(data)
+
+if __name__ == '__main__':
+    app.run(debug=True)""")
+    
+    # Start the Flask server
+    print("Starting Flask server...")
+    server_process = subprocess.Popen(["python", "app.py"])
+    
+    # Give the server a moment to start
+    time.sleep(1)
+    
+    # Open the browser
+    print("Opening visualization in browser...")
+    webbrowser.open('http://127.0.0.1:5000')
+    
+    print("\nVisualization is running!")
+    print("Press Ctrl+C to stop the server when you're done.")
+    
+    try:
+        # Keep the script running
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        # Clean up when user presses Ctrl+C
+        server_process.terminate()
+        print("\nServer stopped. Goodbye!")
+
+if __name__ == "__main__":
+    main()
