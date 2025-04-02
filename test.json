@@ -1,0 +1,21 @@
+{
+  "high_priority_total": 15,
+  "recommended_model": "Model A",
+  "models": [
+    {
+      "name": "Model A",
+      "coverage": 42,
+      "flagged": 12.5
+    },
+    {
+      "name": "Model B",
+      "coverage": 69,
+      "flagged": 16.2
+    },
+    {
+      "name": "Model C",
+      "coverage": 54,
+      "flagged": 32.5
+    }
+  ]
+}

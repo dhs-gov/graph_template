@@ -1,8 +1,6 @@
 import json
 import argparse
 import os
-import random
-
 
 # === Global formatting control ===
 PERCENT_PRECISION = 0  # Change to 1 for decimals like 87.5%
@@ -10,46 +8,32 @@ PERCENT_PRECISION = 0  # Change to 1 for decimals like 87.5%
 def format_percent(value, precision=PERCENT_PRECISION):
     return f"{round(value, precision):.{precision}f}%"
 
-def generate_model_data(models):
+def process_model_data(data):
     """
-    Generate performance data for the specified models with Review Savings metric.
-    All percentages are rounded for display purposes.
+    Process model data from the JSON file and compute derived metrics.
     """
-    data = []
+    processed_data = []
     
-    # Example data - replace with your actual calculation logic
-    for model_name in models:
-        if model_name == "Model A":
-            flagged = 12.5
-        elif model_name == "Model B":
-            flagged = 16.2
-        elif model_name == "Model C":
-            flagged = 32.5
-        else:
-            flagged = random.randint(5, 35) + random.random() * 10
-            
-        review_savings = 100 - flagged
-        coverage = {
-            "Model A": 82,
-            "Model B": 69,
-            "Model C": 54
-        }.get(model_name, random.randint(40, 95))
+    for model in data["models"]:
+        # Calculate review savings from flagged percentage
+        review_savings = 100 - model["flagged"]
         
-        data.append({
-            "name": model_name,
+        processed_data.append({
+            "name": model["name"],
             "review_savings": round(review_savings, PERCENT_PRECISION),
-            "coverage": round(coverage, PERCENT_PRECISION),
-            "flagged": round(flagged, PERCENT_PRECISION),
+            "coverage": round(model["coverage"], PERCENT_PRECISION),
+            "flagged": round(model["flagged"], PERCENT_PRECISION),
         })
     
-    return data
+    return processed_data
 
-def create_simple_html(chart_data, output_file):
+def create_simple_html(chart_data, config_data, output_file):
     """
     Create a simple HTML file with charts using Chart.js
     """
-    # Find the recommended model (Model A in this case)
-    recommended_model = next((model for model in chart_data if model["name"] == "Model A"), chart_data[0])
+    # Find the recommended model from config
+    recommended_model_name = config_data["recommended_model"]
+    recommended_model = next((model for model in chart_data if model["name"] == recommended_model_name), chart_data[0])
     
     # Calculate summary values
     most_savings = max(chart_data, key=lambda x: x['review_savings'])
@@ -63,7 +47,7 @@ def create_simple_html(chart_data, output_file):
     
     # Recommendation visual representation data
     total_documents = 100
-    high_priority_count = 15  # baseline percentage
+    high_priority_count = config_data["high_priority_total"]  # From JSON config
     found_count = round((recommended_model['coverage'] / 100) * high_priority_count)
     flagged_count = round(recommended_model['flagged'])
     review_count = flagged_count  # Number of documents to review
@@ -430,10 +414,11 @@ def create_simple_html(chart_data, output_file):
             
             // Set the recommended model's color in the UI
             setRecommendedModelColor() {{
-                // Dynamically update the recommendation section to match the model's color
-                const modelIndex = 0; // Assuming Model A is at index 0
-                const modelColor = this.colors.palette[modelIndex];
-                const modelBorderColor = this.colors.border[modelIndex];
+                // Get the recommended model's index
+                const recommendedModelName = '{recommended_model['name']}';
+                const modelIndex = chartData.findIndex(model => model.name === recommendedModelName);
+                const modelColor = this.colors.palette[modelIndex >= 0 ? modelIndex : 0];
+                const modelBorderColor = this.colors.border[modelIndex >= 0 ? modelIndex : 0];
                 
                 // Update icon background and SVG fill
                 const iconElem = document.getElementById('model-icon');
@@ -679,19 +664,31 @@ def create_simple_html(chart_data, output_file):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate model performance chart as HTML')
-    parser.add_argument('--models', nargs='+', default=["Model A", "Model B", "Model C"],
-                      help='List of model names to evaluate')
+    parser.add_argument('--config', default='model_config.json',
+                      help='Path to JSON configuration file')
     parser.add_argument('--output', default='model_performance.html',
                       help='Output HTML file path')
     
     args = parser.parse_args()
     
-    # Generate the data with rounded display values
-    print("Generating model performance data...")
-    chart_data = generate_model_data(args.models)
+    # Load data from JSON file
+    print(f"Loading configuration from {args.config}...")
+    try:
+        with open(args.config, 'r') as f:
+            config_data = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: Configuration file '{args.config}' not found.")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: Configuration file '{args.config}' contains invalid JSON.")
+        return
+    
+    # Process the data
+    print("Processing model performance data...")
+    chart_data = process_model_data(config_data)
     
     # Create HTML chart
-    create_simple_html(chart_data, args.output)
+    create_simple_html(chart_data, config_data, args.output)
     
     print(f"Open {args.output} in your web browser to view the charts")
     print("Done!")
