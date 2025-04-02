@@ -8,7 +8,6 @@ This Python tool creates an HTML report that visualizes model performance for do
 
 - `three_graphs.py` - Main Python script that generates performance visualizations
 - `model_performance.html` - The HTML output file with visualizations
-- `model_comparison/` - Directory where PNG exports of the charts are saved
 - `javascript_graphs/` - Reference React code for graph styling (not runnable)
 - `archive/` - Contains previous Python implementation
 
@@ -20,8 +19,7 @@ python three_graphs.py
 
 This will:
 1. Generate three visualization types
-2. Save PNGs to the model_comparison directory
-3. Create an model_performance.html file
+2. Create an model_performance.html file
 
 ## Customization
 
