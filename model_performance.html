@@ -222,10 +222,10 @@
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>Review Savings</span>
-                        <span><strong>87.5%</strong></span>
+                        <span><strong>88%</strong></span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-fill-model" id="savings-bar" style="width: 87.5%"></div>
+                        <div class="progress-fill progress-fill-model" id="savings-bar" style="width: 88.0%"></div>
                     </div>
                     <p class="progress-caption">Higher is better - less content to review</p>
                 </div>
@@ -274,7 +274,7 @@
                 <p class="chart-description">% of documents that can be skipped</p>
                 <canvas id="savingsChart"></canvas>
                 <p class="chart-note">
-                    <strong>Model A</strong> allows skipping 87.5% of documents.
+                    <strong>Model A</strong> allows skipping 88% of documents.
                 </p>
             </div>
         </div>
@@ -288,7 +288,7 @@
         </div>
         <div class="description-text">
             <p><strong>Better models</strong> appear higher and to the right: they find more important items while requiring less review.</p>
-            <p><strong>For example:</strong> Model A finds 82% of important items while allowing you to skip 87.5% of content.</p>
+            <p><strong>For example:</strong> Model A finds 82% of important items while allowing you to skip 88% of content.</p>
         </div>
     </div>
 
@@ -416,7 +416,7 @@
                                         if (label) {
                                             label += ': ';
                                         }
-                                        label += context.parsed.y.toFixed(1) + '%';
+                                        label += context.parsed.y + '%';
                                         return label;
                                     },
                                     afterLabel: function(context) {
@@ -542,7 +542,7 @@
         }
 
         // Initialize data
-        const chartData = [{"name": "Model A", "review_savings": 87.5, "coverage": 82, "flagged": 12.5}, {"name": "Model B", "review_savings": 83.8, "coverage": 69, "flagged": 16.2}, {"name": "Model C", "review_savings": 67.5, "coverage": 54, "flagged": 32.5}];
+        const chartData = [{"name": "Model A", "review_savings": 88.0, "coverage": 82, "flagged": 12.0}, {"name": "Model B", "review_savings": 84.0, "coverage": 69, "flagged": 16.0}, {"name": "Model C", "review_savings": 68.0, "coverage": 54, "flagged": 32.0}];
         
         // Initialize the chart class
         const chartManager = new ModelPerformanceChart();

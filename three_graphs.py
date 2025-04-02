@@ -1,48 +1,46 @@
 import json
 import argparse
 import os
+import random
+
+
+# === Global formatting control ===
+PERCENT_PRECISION = 0  # Change to 1 for decimals like 87.5%
+
+def format_percent(value, precision=PERCENT_PRECISION):
+    return f"{round(value, precision):.{precision}f}%"
 
 def generate_model_data(models):
     """
     Generate performance data for the specified models with Review Savings metric.
+    All percentages are rounded for display purposes.
     """
     data = []
     
     # Example data - replace with your actual calculation logic
     for model_name in models:
-        # This is where you'd put your actual model evaluation code
         if model_name == "Model A":
-            # Review Savings = 100 - flagged
-            data.append({
-                "name": model_name,
-                "review_savings": 87.5,  # 100 - 12.5
-                "coverage": 82,
-                "flagged": 12.5  # Keep for internal calculations
-            })
+            flagged = 12.5
         elif model_name == "Model B":
-            data.append({
-                "name": model_name,
-                "review_savings": 83.8,  # 100 - 16.2
-                "coverage": 69,
-                "flagged": 16.2
-            })
+            flagged = 16.2
         elif model_name == "Model C":
-            data.append({
-                "name": model_name,
-                "review_savings": 67.5,  # 100 - 32.5
-                "coverage": 54,
-                "flagged": 32.5
-            })
+            flagged = 32.5
         else:
-            # Default randomized values for unknown models
-            import random
             flagged = random.randint(5, 35) + random.random() * 10
-            data.append({
-                "name": model_name,
-                "review_savings": 100 - flagged,
-                "coverage": random.randint(40, 95),
-                "flagged": flagged
-            })
+            
+        review_savings = 100 - flagged
+        coverage = {
+            "Model A": 82,
+            "Model B": 69,
+            "Model C": 54
+        }.get(model_name, random.randint(40, 95))
+        
+        data.append({
+            "name": model_name,
+            "review_savings": round(review_savings, PERCENT_PRECISION),
+            "coverage": round(coverage, PERCENT_PRECISION),
+            "flagged": round(flagged, PERCENT_PRECISION),
+        })
     
     return data
 
@@ -304,7 +302,7 @@ def create_simple_html(chart_data, output_file):
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>Coverage</span>
-                        <span><strong>{recommended_model['coverage']}%</strong></span>
+                        <span><strong>{format_percent(recommended_model['coverage'])}</strong></span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill progress-fill-model" id="coverage-bar" style="width: {recommended_model['coverage']}%"></div>
@@ -316,7 +314,7 @@ def create_simple_html(chart_data, output_file):
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>Review Savings</span>
-                        <span><strong>{recommended_model['review_savings']:.1f}%</strong></span>
+                        <span><strong>{format_percent(recommended_model['review_savings'])}</strong></span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill progress-fill-model" id="savings-bar" style="width: {recommended_model['review_savings']}%"></div>
@@ -360,7 +358,7 @@ def create_simple_html(chart_data, output_file):
                 <p class="chart-description">% of important items found</p>
                 <canvas id="coverageChart"></canvas>
                 <p class="chart-note">
-                    <strong>{most_coverage['name']}</strong> finds {most_coverage['coverage']}% of important items.
+                    <strong>{most_coverage['name']}</strong> finds {format_percent(most_coverage['coverage'])} of important items.
                 </p>
             </div>
             <div class="chart-box">
@@ -368,7 +366,7 @@ def create_simple_html(chart_data, output_file):
                 <p class="chart-description">% of documents that can be skipped</p>
                 <canvas id="savingsChart"></canvas>
                 <p class="chart-note">
-                    <strong>{most_savings['name']}</strong> allows skipping {most_savings['review_savings']:.1f}% of documents.
+                    <strong>{most_savings['name']}</strong> allows skipping {format_percent(most_savings['review_savings'])} of documents.
                 </p>
             </div>
         </div>
@@ -382,7 +380,7 @@ def create_simple_html(chart_data, output_file):
         </div>
         <div class="description-text">
             <p><strong>Better models</strong> appear higher and to the right: they find more important items while requiring less review.</p>
-            <p><strong>For example:</strong> {recommended_model['name']} finds {recommended_model['coverage']}% of important items while allowing you to skip {recommended_model['review_savings']:.1f}% of content.</p>
+            <p><strong>For example:</strong> {recommended_model['name']} finds {format_percent(recommended_model['coverage'])} of important items while allowing you to skip {format_percent(recommended_model['review_savings'])} of content.</p>
         </div>
     </div>
 
@@ -510,7 +508,7 @@ def create_simple_html(chart_data, output_file):
                                         if (label) {{
                                             label += ': ';
                                         }}
-                                        label += context.parsed.y.toFixed(1) + '%';
+                                        label += context.parsed.y + '%';
                                         return label;
                                     }},
                                     afterLabel: function(context) {{
@@ -688,7 +686,7 @@ def main():
     
     args = parser.parse_args()
     
-    # Generate the data
+    # Generate the data with rounded display values
     print("Generating model performance data...")
     chart_data = generate_model_data(args.models)
     
