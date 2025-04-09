@@ -8,16 +8,15 @@ This Python tool creates an HTML report that visualizes model performance for do
 
 - `model_visualizer.py` - Main Python script that generates performance visualizations
 - `template.html` - Jinja2 HTML template for the visualization
-- `model_config.json` - Configuration file with model performance data
+- `test.json` - Configuration file with model performance data
 - `model_performance.html` - The generated HTML output file with visualizations
 - `javascript_graphs/` - Reference React code for graph styling (not runnable)
-- `archive/` - Contains previous Python implementation
 - `three_graphs.py` - Original Python script (maintained for reference)
 
 ## Installation
 
 ```bash
-pip install jinja2
+pip install -r requirements.txt
 ```
 
 ## Usage
