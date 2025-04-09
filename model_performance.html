@@ -191,13 +191,13 @@
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
             </div>
-            <h2 class="recommendation-title">Recommended: Model A</h2>
+            <h2 class="recommendation-title">Recommended: llama3.1_newest_temp0.0</h2>
         </div>
         
         <div class="alert-box" id="model-alert">
             <p style="font-size: 14px;">
-                <strong>Bottom line:</strong> Find 6 out of 15 important items
-                while only needing to review 12 documents instead of 100.
+                <strong>Bottom line:</strong> Find 8 out of 8 important items
+                while only needing to review 26 documents instead of 100.
             </p>
         </div>
         
@@ -210,10 +210,10 @@
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>Coverage</span>
-                        <span><strong>42%</strong></span>
+                        <span><strong>100%</strong></span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-fill-model" id="coverage-bar" style="width: 42%"></div>
+                        <div class="progress-fill progress-fill-model" id="coverage-bar" style="width: 100.0%"></div>
                     </div>
                     <p class="progress-caption">Higher is better - finds more important content</p>
                 </div>
@@ -222,10 +222,10 @@
                 <div class="progress-container">
                     <div class="progress-header">
                         <span>Review Savings</span>
-                        <span><strong>88%</strong></span>
+                        <span><strong>74%</strong></span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill progress-fill-model" id="savings-bar" style="width: 88.0%"></div>
+                        <div class="progress-fill progress-fill-model" id="savings-bar" style="width: 74.0%"></div>
                     </div>
                     <p class="progress-caption">Higher is better - less content to review</p>
                 </div>
@@ -240,15 +240,15 @@
                 <div class="document-legend">
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #4CAF50;"></div>
-                        <span>Found (6)</span>
+                        <span>Found (8)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #FF7F7F;"></div>
-                        <span>Missed (9)</span>
+                        <span>Missed (0)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: #A9A9A9;"></div>
-                        <span>False positives (6)</span>
+                        <span>False positives (18)</span>
                     </div>
                 </div>
             </div>
@@ -263,7 +263,7 @@
                 <p class="chart-description">% of important items found</p>
                 <canvas id="coverageChart"></canvas>
                 <p class="chart-note">
-                    <strong>Model B</strong> finds 69% of important items.
+                    <strong>llama3.1_newest_temp0.0</strong> finds 100% of important items.
                 </p>
             </div>
             <div class="chart-box">
@@ -271,7 +271,7 @@
                 <p class="chart-description">% of documents that can be skipped</p>
                 <canvas id="savingsChart"></canvas>
                 <p class="chart-note">
-                    <strong>Model A</strong> allows skipping 88% of documents.
+                    <strong>llama3.1_first_temp0.0</strong> allows skipping 86% of documents.
                 </p>
             </div>
         </div>
@@ -285,7 +285,7 @@
         </div>
         <div class="description-text">
             <p><strong>Better models</strong> appear higher and to the right: they find more important items while requiring less review.</p>
-            <p><strong>For example:</strong> Model A finds 42% of important items while allowing you to skip 88% of content.</p>
+            <p><strong>For example:</strong> llama3.1_newest_temp0.0 finds 100% of important items while allowing you to skip 74% of content.</p>
         </div>
     </div>
 
@@ -336,7 +336,7 @@
             // Set the recommended model's color in the UI
             setRecommendedModelColor() {
                 // Get the recommended model's index
-                const recommendedModelName = 'Model A';
+                const recommendedModelName = 'llama3.1_newest_temp0.0';
                 const modelIndex = chartData.findIndex(model => model.name === recommendedModelName);
                 const modelColor = this.colors.palette[modelIndex >= 0 ? modelIndex : 0];
                 const modelBorderColor = this.colors.border[modelIndex >= 0 ? modelIndex : 0];
@@ -396,9 +396,10 @@
                             y: {
                                 beginAtZero: true,
                                 max: 100,
+                                stepSize: 20, // Ensure ticks include 100
                                 ticks: {
                                     callback: function(value) {
-                                        return value + '%';
+                                        return value ? value + '%' : '';
                                     }
                                 }
                             }
@@ -472,7 +473,7 @@
                             },
                             y: {
                                 min: 0,
-                                max: 100,
+                                max: 105,
                                 title: {
                                     display: true,
                                     text: 'Coverage (%)',
@@ -482,7 +483,7 @@
                                 },
                                 ticks: {
                                     callback: function(value) {
-                                        return value + '%';
+                                        return value <= 100 ? value + '%' : '';
                                     }
                                 }
                             }
@@ -539,7 +540,7 @@
         }
 
         // Initialize data
-        const chartData = [{"name": "Model A", "review_savings": 88.0, "coverage": 42, "flagged": 12.0}, {"name": "Model B", "review_savings": 84.0, "coverage": 69, "flagged": 16.0}, {"name": "Model C", "review_savings": 68.0, "coverage": 54, "flagged": 32.0}];
+        const chartData = [{"name": "llama3.1_newest_temp0.0", "review_savings": 74.0, "coverage": 100.0, "flagged": 26.0}, {"name": "llama3.1_step_trinary_feedback_temp0.0", "review_savings": 76.0, "coverage": 88.0, "flagged": 24.0}, {"name": "llama3.1_first_temp0.0", "review_savings": 86.0, "coverage": 50.0, "flagged": 14.0}];
         
         // Initialize the chart class
         const chartManager = new ModelPerformanceChart();
@@ -575,9 +576,9 @@
         // Create document grid visualization
         chartManager.createDocumentGrid('document-grid', {
             totalDocuments: 100,
-            highPriorityCount: 15,
-            foundCount: 6,
-            flaggedCount: 12
+            highPriorityCount: 8,
+            foundCount: 8,
+            flaggedCount: 26
         });
         
         // Update the recommendation section colors

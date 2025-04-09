@@ -1,2 +1,8 @@
+
 myenv/
 __pycache__/
+newenv/
+archive/
+model_performance.html
+javascript_graphs
+.DS_Store

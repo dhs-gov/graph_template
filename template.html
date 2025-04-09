@@ -396,9 +396,10 @@
                             y: {
                                 beginAtZero: true,
                                 max: 100,
+                                stepSize: 20, // Ensure ticks include 100
                                 ticks: {
                                     callback: function(value) {
-                                        return value + '%';
+                                        return value ? value + '%' : '';
                                     }
                                 }
                             }
@@ -472,7 +473,7 @@
                             },
                             y: {
                                 min: 0,
-                                max: 100,
+                                max: 105,
                                 title: {
                                     display: true,
                                     text: 'Coverage (%)',
@@ -482,7 +483,7 @@
                                 },
                                 ticks: {
                                     callback: function(value) {
-                                        return value + '%';
+                                        return value <= 100 ? value + '%' : '';
                                     }
                                 }
                             }
